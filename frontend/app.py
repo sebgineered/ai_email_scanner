@@ -18,6 +18,7 @@ st.markdown("Paste an email message below to scan it for prompt injection risks 
 # Email content input
 email_text = st.text_area("✉️ Email Content", height=300)
 
+
 # Trigger scan
 if st.button("🔍 Scan Email"):
     if not email_text.strip():
