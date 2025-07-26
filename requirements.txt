@@ -1,0 +1,5 @@
+streamlit
+sonnylabs
+openai
+requests
+python-dotenv
