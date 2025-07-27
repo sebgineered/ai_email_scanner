@@ -1,7 +1,10 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
+
+# Add the parent directory to the Python path to allow backend imports
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from backend.email_security_pipeline import EmailSecurityPipeline
 
 # Set page config
@@ -12,7 +15,7 @@ st.title("AI Email Security Scanner")
 st.markdown("""
 Enter the **content of an email** you'd like to analyze.  
 This tool will:
-1. Detect **prompt injection risks** (via SonnyLabs)
+1. Detect **prompt injection risks** (via Lakera)
 2. Extract any **URLs** from the message
 3. Check those URLs for **malware/phishing** (via VirusTotal)
 """)
@@ -31,10 +34,9 @@ if st.button("🔍 Scan Email"):
 
         # Display prompt injection score
         score = result.get("prompt_score", 0)
-        st.markdown(f"###Prompt Injection Risk Score: `{score:.2f}`")
+        st.markdown(f"### Prompt Injection Risk Score: `{score:.2f}`")
 
         if score > 0.8:
-            
             st.error("High risk of prompt injection detected!")
         elif score > 0.4:
             st.warning("Moderate prompt injection risk.")
@@ -59,4 +61,4 @@ if st.button("🔍 Scan Email"):
 
 # Footer
 st.markdown("---")
-st.markdown("Built by **Sebastian Konefal** · Powered by [SonnyLabs](https://sonnylabs.ai), Cohere & VirusTotal")
+st.markdown("Built by **Sebastian Konefal** · Powered by [Lakera](https://lakera.ai), [Cohere](https://cohere.ai) & [VirusTotal](https://virustotal.com)")
