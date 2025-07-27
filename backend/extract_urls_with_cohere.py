@@ -19,7 +19,7 @@ try:
 except ImportError:
     cohere = None
 
-def extract_urls_with_cohere(text):
+def extract_urls_with_cohere(text, prompt_injection_flagged=False):
     """
     Extract URLs from the given text using Cohere's LLM, or fallback to regex if Cohere is unavailable.
     Returns a list of URLs.
@@ -33,8 +33,11 @@ def extract_urls_with_cohere(text):
 
     if cohere and api_key:
         client = cohere.Client(api_key)
+        warning = ""
+        if prompt_injection_flagged:
+            warning = "WARNING: This email was flagged as a prompt injection attempt.\n\n"
         prompt = (
-            "Extract all URLs from the following email text. "
+            f"{warning}Extract all URLs from the following email text. "
             "Return only a comma-separated list of URLs, no explanations.\n\n"
             f"Email:\n{text}\n\nURLs:"
         )

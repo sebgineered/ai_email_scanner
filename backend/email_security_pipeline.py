@@ -19,8 +19,8 @@ class EmailSecurityPipeline:
         prompt_result = checker.analyze_text(email_text)
         flagged = prompt_result.get("flagged", False)
 
-        # Step 2: Extract URLs using Cohere
-        urls = extract_urls_with_cohere.extract_urls_with_cohere(email_text)
+        # Step 2: Extract URLs using Cohere, inform if prompt injection flagged
+        urls = extract_urls_with_cohere.extract_urls_with_cohere(email_text, prompt_injection_flagged=flagged)
 
         # Step 3: Scan each URL with VirusTotal via MCP
         results = []
