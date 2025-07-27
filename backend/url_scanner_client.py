@@ -42,11 +42,33 @@ def check_url_with_mcp(url, api_key=None):
         get_response = requests.get(get_url, headers=headers, timeout=10)
         get_response.raise_for_status()
         vt_data = get_response.json()
-        # Extract stats
-        stats = vt_data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+        attr = vt_data.get("data", {}).get("attributes", {})
+        stats = attr.get("last_analysis_stats", {})
+        categories = attr.get("categories", {})
+        reputation = attr.get("reputation", 0)
+        last_analysis_date = attr.get("last_analysis_date", None)
+        last_final_url = attr.get("last_final_url", "")
+        threat_names = attr.get("threat_names", [])
+        votes = attr.get("total_votes", {})
+        # Get top engines that flagged as malicious/suspicious
+        flagged_engines = []
+        for engine, result in attr.get("last_analysis_results", {}).items():
+            if result.get("category") in ("malicious", "suspicious"):
+                flagged_engines.append({
+                    "engine": engine,
+                    "category": result.get("category"),
+                    "result": result.get("result")
+                })
         return {
             "malicious": stats.get("malicious", 0),
             "suspicious": stats.get("suspicious", 0),
+            "categories": categories,
+            "reputation": reputation,
+            "last_analysis_date": last_analysis_date,
+            "last_final_url": last_final_url,
+            "threat_names": threat_names,
+            "votes": votes,
+            "flagged_engines": flagged_engines,
             "raw": vt_data  # Optionally include the raw data for debugging
         }
     except Exception as e:
