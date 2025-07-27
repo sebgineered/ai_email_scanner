@@ -103,16 +103,12 @@ if st.button("🔍 Scan Email"):
             pipeline = EmailSecurityPipeline()
             result = pipeline.process_email(email_text)
 
-        # Display prompt injection score
-        score = result.get("prompt_score", 0)
-        st.markdown(f"### Prompt Injection Risk Score: `{score:.2f}`")
-
-        if score > 0.8:
-            st.error("High risk of prompt injection detected!")
-        elif score > 0.4:
-            st.warning("Moderate prompt injection risk.")
+          # Display prompt injection result from Lakera only
+        prompt_flagged = result.get("prompt_flagged", False)
+        if prompt_flagged:
+            st.error("Prompt injection attempt detected! (Lakera flagged this input)")
         else:
-            st.success("Low prompt injection risk.")
+            st.success("No prompt injection detected by Lakera.")
 
         # Display URL results
         url_results = result.get("urls", [])

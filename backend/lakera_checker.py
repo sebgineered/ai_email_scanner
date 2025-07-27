@@ -49,7 +49,8 @@ class LakeraChecker:
         headers = {
             "Authorization": f"Bearer {self.api_key}"
         }
-
+        #Testing breakpoint
+        #import pdb; pdb.set_trace()
         try:
             response = self.session.post(self.endpoint, json=payload, headers=headers, timeout=10)
             response.raise_for_status()

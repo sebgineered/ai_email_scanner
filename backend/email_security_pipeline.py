@@ -17,7 +17,7 @@ class EmailSecurityPipeline:
         # Step 1: Scan user input for prompt injection using Lakera
         checker = lakera_checker.LakeraChecker(api_key=self.lakera_api_key)
         prompt_result = checker.analyze_text(email_text)
-        score = prompt_result.get("analysis", [{}])[0].get("result", 0.0)
+        flagged = prompt_result.get("flagged", False)
 
         # Step 2: Extract URLs using Cohere
         urls = extract_urls_with_cohere.extract_urls_with_cohere(email_text)
@@ -29,6 +29,6 @@ class EmailSecurityPipeline:
             results.append({"url": url, "result": scan})
 
         return {
-            "prompt_score": score,
+            "prompt_flagged": flagged,
             "urls": results
         }
