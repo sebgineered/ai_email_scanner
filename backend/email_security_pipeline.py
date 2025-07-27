@@ -15,7 +15,8 @@ class EmailSecurityPipeline:
 
     def process_email(self, email_text: str):
         # Step 1: Scan user input for prompt injection using Lakera
-        prompt_result = lakera_checker.scan_prompt_injection(email_text, self.lakera_api_key)
+        checker = lakera_checker.LakeraChecker(api_key=self.lakera_api_key)
+        prompt_result = checker.analyze_text(email_text)
         score = prompt_result.get("analysis", [{}])[0].get("result", 0.0)
 
         # Step 2: Extract URLs using Cohere
