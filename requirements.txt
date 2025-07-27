@@ -1,5 +1,4 @@
-streamlit
-sonnylabs
-openai
+streamlit>=1.37.0
+cohere
 requests
 python-dotenv
