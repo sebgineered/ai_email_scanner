@@ -150,4 +150,8 @@ if st.button("🔍 Scan Email"):
 
 # Footer
 st.markdown("---")
+
+# Incoming Features
+st.markdown("### Incoming Features")
+st.markdown("- **Attachment Scanning**: Soon you'll be able to upload and scan email attachments (PDF, DOCX, etc.) for malware or phishing links, powered by VirusTotal and other file scanning APIs.")
 st.markdown("Built by **[Sebastian Konefal](https://www.linkedin.com/in/sebastian-konefal/)** · Powered by [Lakera](https://lakera.ai), [Cohere](https://cohere.ai) & [VirusTotal](https://virustotal.com) · [Semgrep](https://semgrep.dev/) SAST tested")

@@ -22,6 +22,16 @@ This tool is ideal for red teamers, AI engineers, and security analysts looking 
 
 ---
 
+## Incoming Features
+
+- **Attachment Scanning**[^1]
+
+---
+
+[^1]: Attachment Scanning will allow users to upload and scan email attachments (PDF, DOCX, etc.) for malware or phishing links. This will integrate with VirusTotal or other file scanning APIs to enhance email security analysis.
+
+---
+
 ## Project Structure
 
 ```
