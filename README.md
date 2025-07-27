@@ -12,10 +12,11 @@ This tool is ideal for red teamers, AI engineers, and security analysts looking 
 
 ## Features
 
-- Check for **prompt injection risks** using Lakera Guard API
-- Extract **URLs from unstructured email text** using Cohere's LLM
-- Scan URLs for malware and phishing via VirusTotal
+- Check for **prompt injection risks** using Lakera Guard API (shows only flagged/unflagged status)
+- Extract **URLs from unstructured email text** using Cohere's LLM (or regex fallback)
+- Scan URLs for malware and phishing via VirusTotal, with rich per-link details and color-coded results
 - Clean, readable **Streamlit UI** for fast feedback
+- Example malicious email available via opt-in checkbox
 
 ---
 
@@ -24,7 +25,7 @@ This tool is ideal for red teamers, AI engineers, and security analysts looking 
 ```
 ai_email_scanner/
 ├── frontend/                 # Streamlit web UI
-│   └── app.py
+│   └── streamlit_app.py
 ├── backend/                  # Core logic components
 │   ├── lakera_checker.py
 │   ├── extract_urls_with_cohere.py
@@ -84,8 +85,17 @@ python -m venv .venv
 source .venv/bin/activate       # On Linux/macOS
 
 pip install -r requirements.txt
-streamlit run frontend/app.py
+streamlit run frontend/streamlit_app.py
 ```
+
+---
+
+## Usage
+
+- Paste or type email content into the text area.
+- Optionally, tick the checkbox to auto-populate an example malicious email.
+- Click **Scan Email** to analyze for prompt injection and malicious URLs.
+- Results are color-coded and links are disabled if found malicious.
 
 ---
 
@@ -93,17 +103,22 @@ streamlit run frontend/app.py
 
 This app is fully compatible with [Streamlit Community Cloud](https://streamlit.io/cloud):
 
-- Make sure `frontend/app.py` is the entry point
+- Make sure `frontend/streamlit_app.py` is the entry point
 - Add your secrets in the **Streamlit deploy settings**
-- Add a navigation link to this app in your Hugo website if desired
 
 ---
 
 ## Example Use Case
 
 > Paste a suspicious email into the app and see:
-> - Prompt injection risk score
+> - Prompt injection flagged status (no risk score, just flagged/unflagged)
 > - Extracted links
-> - VirusTotal threat detection results for each URL
-
+> - VirusTotal threat detection results for each URL, with color-coded and clickable/disabled links
+> 
 ---
+
+## Security & Testing
+
+- All API keys are loaded from environment variables or Streamlit secrets.
+- The app disables clickable links for malicious URLs and obfuscates them.
+- [Semgrep](https://semgrep.dev/)
