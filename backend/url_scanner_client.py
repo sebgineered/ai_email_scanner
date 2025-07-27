@@ -1,0 +1,53 @@
+import os
+import requests
+import base64
+
+try:
+    import streamlit as st
+except ImportError:
+    st = None
+
+def check_url_with_mcp(url, api_key=None):
+    """
+    Check a URL with VirusTotal and return the scan result.
+    """
+    # Get API key from Streamlit secrets or environment variable
+    if not api_key:
+        if st and hasattr(st, "secrets") and "VIRUSTOTAL_API_KEY" in st.secrets:
+            api_key = st.secrets["VIRUSTOTAL_API_KEY"]
+        else:
+            api_key = os.getenv("VIRUSTOTAL_API_KEY")
+    if not api_key:
+        raise ValueError("Missing VIRUSTOTAL_API_KEY in environment variables or secrets.toml")
+
+    endpoint = "https://www.virustotal.com/api/v3/urls"
+    headers = {"x-apikey": api_key}
+
+    # Step 1: Submit the URL for scanning
+    data = {"url": url}
+    try:
+        post_response = requests.post(endpoint, headers=headers, data=data, timeout=10)
+        post_response.raise_for_status()
+    except Exception as e:
+        return {"error": f"Submission failed: {str(e)}"}
+
+    # Step 2: Get the scan ID (base64-encoded URL, no padding)
+    url_id = base64.urlsafe_b64encode(url.encode()).decode().rstrip("=")
+    get_url = f"{endpoint}/{url_id}"
+
+    #Testing breakpoint
+    #import pdb; pdb.set_trace()
+
+    try:
+        get_response = requests.get(get_url, headers=headers, timeout=10)
+        get_response.raise_for_status()
+        vt_data = get_response.json()
+        # Extract stats
+        stats = vt_data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+        return {
+            "malicious": stats.get("malicious", 0),
+            "suspicious": stats.get("suspicious", 0),
+            "raw": vt_data  # Optionally include the raw data for debugging
+        }
+    except Exception as e:
+        return {"error": f"Result fetch failed: {str(e)}"}
