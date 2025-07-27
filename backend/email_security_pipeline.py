@@ -15,8 +15,8 @@ class EmailSecurityPipeline:
         prompt_result = self.prompt_scanner.analyze_text(email_text, scan_type="input")
         tag = prompt_result["tag"]
         
-        # Step 2: Extract URLs using GPT
-        urls = extract_urls_with_cohere.extract_urls_with_gpt(email_text)
+        # Step 2: Extract URLs using Cohere
+        urls = extract_urls_with_cohere.extract_urls_with_cohere(email_text)
 
         # Step 3: Scan each URL with VirusTotal via MCP
         results = []

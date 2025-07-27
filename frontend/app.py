@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 from backend.email_security_pipeline import EmailSecurityPipeline
 
@@ -31,6 +34,7 @@ if st.button("🔍 Scan Email"):
         st.markdown(f"###Prompt Injection Risk Score: `{score:.2f}`")
 
         if score > 0.8:
+            
             st.error("High risk of prompt injection detected!")
         elif score > 0.4:
             st.warning("Moderate prompt injection risk.")
