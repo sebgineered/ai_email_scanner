@@ -6,6 +6,8 @@ A Streamlit-based web app that scans email content for prompt injection vulnerab
 - [Cohere](https://cohere.com) — for intelligent URL extraction
 - [VirusTotal](https://www.virustotal.com) — to detect malicious links
 
+**▶️ [Try the deployed app here](https://aiemailscanner.streamlit.app/)**
+
 This tool is ideal for red teamers, AI engineers, and security analysts looking to audit LLM-based inputs in a structured and user-friendly way.
 
 ---
