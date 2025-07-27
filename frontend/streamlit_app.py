@@ -125,4 +125,4 @@ if st.button("🔍 Scan Email"):
 
 # Footer
 st.markdown("---")
-st.markdown("Built by **Sebastian Konefal** · Powered by [Lakera](https://lakera.ai), [Cohere](https://cohere.ai) & [VirusTotal](https://virustotal.com)")
+st.markdown("Built by **Sebastian Konefal** · Powered by [Lakera](https://lakera.ai), [Cohere](https://cohere.ai) & [VirusTotal](https://virustotal.com) · [Sempgrep](https://semgrep.dev/) SAST tested")
