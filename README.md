@@ -3,7 +3,7 @@
 A Streamlit-based web app that scans email content for prompt injection vulnerabilities and malicious URLs using:
 
 - [SonnyLabs](https://sonnylabs.ai) — AI security vulnerability scanner
-- OpenAI GPT-4 — for intelligent URL extraction
+- [Cohere](https://cohere.com) — for intelligent URL extraction
 - [VirusTotal](https://www.virustotal.com) — to detect malicious links
 
 This tool is ideal for red teamers, AI engineers, and security analysts looking to audit LLM-based inputs in a structured and user-friendly way.
@@ -13,7 +13,7 @@ This tool is ideal for red teamers, AI engineers, and security analysts looking 
 ## Features
 
 - Check for **prompt injection risks** using SonnyLabs API
-- Extract **URLs from unstructured email text** using GPT-4
+- Extract **URLs from unstructured email text** using Cohere's LLM
 - Scan URLs for malware and phishing via VirusTotal
 - Clean, readable **Streamlit UI** for fast feedback
 
@@ -27,7 +27,7 @@ ai_email_scanner/
 │   └── app.py
 ├── backend/                  # Core logic components
 │   ├── sonnylabs_checker.py
-│   ├── gpt_url_extractor.py
+│   ├── extract_urls_with_cohere.py
 │   └── url_scanner_client.py
 ├── .env                      # Your secret API keys (not committed)
 ├── .env.template             # Template for environment setup
@@ -68,7 +68,7 @@ chmod +x setup_venv.sh
 Copy `.env.template` and rename it to `.env`, then fill in your actual API keys:
 
 ```env
-OPENAI_API_KEY=your_openai_key
+COHERE_API_KEY=your_cohere_api_key
 SONNYLABS_API_TOKEN=your_sonnylabs_api_token
 SONNYLABS_ANALYSIS_ID=your_analysis_id
 VIRUSTOTAL_API_KEY=your_virustotal_api_key
@@ -82,7 +82,7 @@ VIRUSTOTAL_API_KEY=your_virustotal_api_key
 python -m venv .venv
 .venv\Scripts\activate          # On Windows
 # OR
-source .venv/bin/activate       # On Linux/macOS
+source .venv/bin/activate         # On Linux/macOS
 
 pip install -r requirements.txt
 streamlit run frontend/app.py
