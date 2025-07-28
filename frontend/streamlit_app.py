@@ -17,7 +17,7 @@ st.markdown("""
 Enter the **content of an email** you'd like to analyze.  
 This tool will:
 1. Detect **prompt injection risks** (via Lakera)  
-2. Extract any **URLs** from the message  
+2. Extract any **URLs** from the message (via Cohere LLM)
 3. Check those URLs for **malware/phishing** (via VirusTotal)
 """)
 
