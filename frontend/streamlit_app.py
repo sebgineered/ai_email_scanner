@@ -17,7 +17,7 @@ st.markdown("""
 Enter the **content of an email** you'd like to analyze.  
 This tool will:
 1. Detect **prompt injection risks** (via Lakera)  
-2. Extract any **URLs** from the message (via Cohere LLM)
+2. Extract any **URLs** from the message (via enhanced regex patterns)
 3. Check those URLs for **malware/phishing** (via VirusTotal)
 """)
 
@@ -138,6 +138,32 @@ if st.button("🔍 Scan Email"):
             st.error("Prompt injection attempt detected! (Lakera flagged this input)")
         else:
             st.success("No prompt injection detected by Lakera.")
+
+        # Display intelligent interpretations from Cohere
+        interpretations = result.get("interpretations", {})
+        if interpretations:
+            st.markdown("### 🤖 AI-Powered Analysis")
+            
+            # Tone analysis
+            tone_analysis = interpretations.get("tone_analysis", "")
+            if tone_analysis and tone_analysis != "Cohere API not available":
+                st.markdown("#### 📧 Email Tone Analysis")
+                st.info(tone_analysis)
+            
+            # Prompt injection interpretation
+            prompt_interpretation = interpretations.get("prompt_injection_interpretation", "")
+            if prompt_interpretation and prompt_interpretation != "Cohere API not available":
+                st.markdown("#### ⚠️ Prompt Injection Analysis")
+                if prompt_flagged:
+                    st.error(prompt_interpretation)
+                else:
+                    st.info(prompt_interpretation)
+            
+            # URL threat analysis
+            url_analysis = interpretations.get("url_analysis", "")
+            if url_analysis and url_analysis != "Cohere API not available":
+                st.markdown("#### 🔗 URL Threat Analysis")
+                st.info(url_analysis)
 
         # Display URL results
         url_results = result.get("urls", [])

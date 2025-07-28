@@ -1,5 +1,5 @@
 import streamlit as st
-from backend import extract_urls_with_cohere, lakera_checker, url_scanner_client
+from backend import extract_urls_with_urllib, lakera_checker, url_scanner_client, cohere_interpreter
 
 '''
 Centralises logic and validation.
@@ -19,8 +19,8 @@ class EmailSecurityPipeline:
         prompt_result = checker.analyze_text(email_text)
         flagged = prompt_result.get("flagged", False)
 
-        # Step 2: Extract URLs using Cohere, inform if prompt injection flagged
-        urls = extract_urls_with_cohere.extract_urls_with_cohere(email_text, prompt_injection_flagged=flagged)
+        # Step 2: Extract URLs using enhanced regex patterns, inform if prompt injection flagged
+        urls = extract_urls_with_urllib.extract_urls_with_urllib(email_text, prompt_injection_flagged=flagged)
 
         # Step 3: Scan each URL with VirusTotal via MCP
         results = []
@@ -28,7 +28,16 @@ class EmailSecurityPipeline:
             scan = url_scanner_client.check_url_with_mcp(url)
             results.append({"url": url, "result": scan})
 
+        # Step 4: Generate intelligent interpretation using Cohere
+        interpreter = cohere_interpreter.CohereInterpreter()
+        interpretations = interpreter.interpret_results(
+            email_text=email_text,
+            prompt_injection_result=prompt_result,
+            url_results=results
+        )
+
         return {
             "prompt_flagged": flagged,
-            "urls": results
+            "urls": results,
+            "interpretations": interpretations
         }
