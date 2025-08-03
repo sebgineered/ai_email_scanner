@@ -180,4 +180,4 @@ st.markdown("---")
 # Incoming Features
 st.markdown("### Incoming Features")
 st.markdown("- **Attachment Scanning**: Soon you'll be able to upload and scan email attachments (PDF, DOCX, etc.) for malware or phishing links, powered by VirusTotal and other file scanning APIs.")
-st.markdown("Built by **[Sebastian Konefal](https://www.linkedin.com/in/sebastian-konefal/)** · Powered by [Lakera](https://lakera.ai), [Cohere](https://cohere.ai) & [VirusTotal](https://virustotal.com) · [Semgrep](https://semgrep.dev/) SAST tested")
+st.markdown("Built by **[Sebastian Konefal](https://www.linkedin.com/in/sebastian-konefal/)** · Powered by [Lakera](https://lakera.ai), [gemini 2.0 flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash) & [VirusTotal](https://virustotal.com) · [Semgrep](https://semgrep.dev/) SAST tested")

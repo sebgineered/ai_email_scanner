@@ -3,7 +3,7 @@
 A Streamlit-based web app that scans email content for prompt injection vulnerabilities and malicious URLs using:
 
 - [Lakera](https://lakera.ai) — AI security vulnerability scanner
-- [Cohere](https://cohere.com) — for intelligent analysis and interpretation
+- [Gemini](https://ai.google.dev/) — for intelligent analysis and interpretation
 - [VirusTotal](https://www.virustotal.com) — to detect malicious links
 
 **▶️ [Try the deployed app here](https://aiemailscanner.streamlit.app/)**
@@ -29,7 +29,7 @@ This tool is ideal for red teamers, AI engineers, security analysts, and anyone 
 ## Recent Updates
 
 ### v2.0 - AI-Powered Analysis
-- **🤖 New CohereInterpreter**: Intelligent analysis of email tone, security implications, and threat context
+- **🤖 New GeminiInterpreter**: Intelligent analysis of email tone, security implications, and threat context, now powered by `gemini-2.0-flash`.
 - **🔗 Enhanced URL Extraction**: Replaced LLM-based extraction with robust regex patterns for better reliability
 - **📊 Improved UI**: Added AI-powered analysis section with actionable insights
 - **⚡ Better Performance**: Faster URL extraction without API dependencies
@@ -62,7 +62,7 @@ ai_email_scanner/
 ├── backend/                  # Core logic components
 │   ├── lakera_checker.py
 │   ├── extract_urls_with_urllib.py
-│   ├── cohere_interpreter.py
+│   ├── gemini_interpreter.py
 │   └── url_scanner_client.py
 ├── .env                      # Your secret API keys (not committed)
 ├── .env.template             # Template for environment setup
@@ -104,7 +104,7 @@ Copy `.env.template` and rename it to `.env`, then fill in your actual API keys:
 
 ```env
 LAKERA_API_KEY=your_lakera_api_key
-COHERE_API_KEY=your_cohere_api_key
+GEMINI_API_KEY=your_gemini_api_key
 VIRUSTOTAL_API_KEY=your_virustotal_api_key
 ```
 
@@ -163,7 +163,7 @@ This app is fully compatible with [Streamlit Community Cloud](https://streamlit.
 ### Architecture
 - **Backend Pipeline**: Modular design with separate components for each security check
 - **URL Extraction**: Enhanced regex patterns handle URLs in code blocks, parentheses, and quotes
-- **AI Integration**: Cohere LLM provides intelligent analysis without executing user input
+- **AI Integration**: Gemini LLM (`gemini-2.0-flash`) provides intelligent analysis without executing user input
 - **API Security**: All external calls use secure API keys from environment variables
 
 ### Security Features

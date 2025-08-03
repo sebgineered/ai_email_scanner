@@ -1,5 +1,5 @@
 import streamlit as st
-from backend import extract_urls_with_urllib, lakera_checker, url_scanner_client, cohere_interpreter
+from backend import extract_urls_with_urllib, lakera_checker, url_scanner_client, gemini_interpreter
 
 '''
 Centralises logic and validation.
@@ -29,7 +29,7 @@ class EmailSecurityPipeline:
             results.append({"url": url, "result": scan})
 
         # Step 4: Generate intelligent interpretation using Cohere
-        interpreter = cohere_interpreter.CohereInterpreter()
+        interpreter = gemini_interpreter.GeminiInterpreter()
         interpretations = interpreter.interpret_results(
             email_text=email_text,
             prompt_injection_result=prompt_result,
