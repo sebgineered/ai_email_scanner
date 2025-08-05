@@ -14,6 +14,7 @@ This tool is ideal for red teamers, AI engineers, security analysts, and anyone 
 
 ## Features
 
+- **📎 Attachment Scanning**: Upload and scan email attachments (PDF, DOCX, TXT) for malware and other threats using VirusTotal.
 - **🔍 Prompt Injection Detection**: Check for prompt injection risks using Lakera Guard API
 - **🔗 URL Extraction**: Extract URLs from email text using enhanced regex patterns (no LLM dependency)
 - **🛡️ URL Scanning**: Scan URLs for malware and phishing via VirusTotal with detailed results
@@ -27,6 +28,10 @@ This tool is ideal for red teamers, AI engineers, security analysts, and anyone 
 ---
 
 ## Recent Updates
+
+### v2.1 - Attachment Scanning
+- **📎 New Feature**: Users can now upload and scan email attachments (PDF, DOCX, TXT) for threats.
+- **🐛 Bug Fixes**: Resolved issues with UI display, resource leaks, and backend stability.
 
 ### v2.0 - AI-Powered Analysis
 - **🤖 New GeminiInterpreter**: Intelligent analysis of email tone, security implications, and threat context, now powered by `gemini-2.0-flash`.
@@ -43,13 +48,8 @@ This tool is ideal for red teamers, AI engineers, security analysts, and anyone 
 
 ## Incoming Features
 
-- **📎 Attachment Scanning**[^1]: Upload and scan email attachments (PDF, DOCX, etc.) for malware
 - **🔗 MCP Integration**: Support for Model Context Protocol servers for enhanced threat intelligence
 - **📈 Analytics Dashboard**: Historical scan results and threat trends
-
----
-
-[^1]: Attachment Scanning will allow users to upload and scan email attachments (PDF, DOCX, etc.) for malware or phishing links. This will integrate with VirusTotal or other file scanning APIs to enhance email security analysis.
 
 ---
 
@@ -127,14 +127,16 @@ streamlit run frontend/streamlit_app.py
 ## Usage
 
 1. **📝 Input Email**: Paste or type email content into the text area
-2. **🧪 Demo Mode**: Optionally, tick the checkbox to auto-populate an example malicious email
-3. **🔍 Scan**: Click **Scan Email** to run the complete security analysis
-4. **📊 Review Results**: View:
+2. **📎 Upload Attachment (Optional)**: Click the "Upload an attachment" button to select a file (PDF, DOCX, TXT).
+3. **🧪 Demo Mode**: Optionally, tick the checkbox to auto-populate an example malicious email
+4. **🔍 Scan**: Click **Scan Email and Attachment** to run the complete security analysis
+5. **📊 Review Results**: View:
    - Prompt injection detection status
    - AI-powered analysis of email tone and threats
    - Detailed URL scan results with threat scores
+   - Attachment scan results with a summary of potential threats.
    - Color-coded results (red for malicious, green for safe)
-5. **🛡️ Take Action**: Links are automatically disabled if found malicious
+6. **🛡️ Take Action**: Links are automatically disabled if found malicious
 
 ---
 
