@@ -1,10 +1,9 @@
-"""
-Gemini Interpreter Module
+'''Gemini Interpreter Module
 
 This module provides intelligent interpretation of email security scan results using Google's Gemini API.
 It analyzes the tone of emails, interprets prompt injection results, and explains VirusTotal findings.
+'''
 
-"""
 import os
 import json
 from typing import List, Dict, Any, Optional
@@ -97,11 +96,11 @@ class GeminiInterpreter:
         return "\n".join(formatted_results)
     
     def interpret_results(self, 
-                         email_text: str, 
-                         prompt_injection_result: Dict[str, Any], 
-                         url_results: List[Dict[str, Any]]) -> Dict[str, str]:
+                          email_text: str, 
+                          prompt_injection_result: Dict[str, Any], 
+                          url_results: List[Dict[str, Any]]) -> Dict[str, str]:
         """
-        Generate intelligent interpretation of all scan results.
+        Generate intelligent interpretation of all scan results related to email content.
         
         Args:
             email_text: The full email content
@@ -118,12 +117,48 @@ class GeminiInterpreter:
                 "url_analysis": "Gemini API not available"
             }
         
-        try:
-            # Format VirusTotal results
-            vt_results_text = self._format_virustotal_results(url_results)
+        prompt = self._build_email_prompt(email_text, prompt_injection_result, url_results)
+        return self._generate_interpretation(prompt)
+
+    def interpret_file_results(self, file_results: Dict[str, Any]) -> Dict[str, str]:
+        """
+        Generate intelligent interpretation of file scan results.
+
+        Args:
+            file_results: Results from VirusTotal file scanning
+
+        Returns:
+            Dictionary containing interpretations for file analysis
+        """
+        if not self.model:
+            return {
+                "file_analysis": "Gemini API not available"
+            }
+
+        prompt = self._build_file_prompt(file_results)
+        return self._generate_interpretation(prompt)
+
+    def _build_email_prompt(self, 
+                         email_text: str, 
+                         prompt_injection_result: Dict[str, Any], 
+                         url_results: List[Dict[str, Any]]) -> str:
+        """
+        Generate intelligent interpretation of all scan results.
+        
+        Args:
+            email_text: The full email content
+            prompt_injection_result: Results from Lakera prompt injection check
+            url_results: Results from VirusTotal URL scanning
             
-            # Create comprehensive prompt
-            prompt = f"""
+        Returns:
+            A string containing the prompt for Gemini.
+        """
+
+        # Format VirusTotal results
+        vt_results_text = self._format_virustotal_results(url_results)
+
+        # Create comprehensive prompt
+        prompt = f"""
 Analyze the following email security scan results and provide concise interpretations (under 600 characters each):
 
 EMAIL CONTENT:
@@ -145,28 +180,72 @@ Provide three separate interpretations:
 
 Keep each interpretation under 600 characters and focus on actionable security insights.
 """
-            
+        return prompt
+
+    def _build_file_prompt(self, file_results: Dict[str, Any]) -> str:
+        """
+        Build a prompt for Gemini to interpret file scan results.
+
+        Args:
+            file_results: Results from VirusTotal file scanning
+
+        Returns:
+            A string containing the prompt for Gemini.
+        """
+
+        if not file_results:
+            return "No file scan results available."
+
+        # Format file scan results for the prompt
+        if file_results.get("error"):
+            vt_results_text = f"Error scanning file: {file_results['error']}"
+        else:
+            # Extract relevant information from the file_results
+            stats = file_results.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+            vt_results_text = f"File Scan Results: {stats}"
+
+        # Create comprehensive prompt
+        prompt = f"""
+        Analyze the following VirusTotal file scan results and provide a concise interpretation (under 600 characters):
+
+        VIRUSTOTAL FILE SCAN RESULTS:
+        {vt_results_text}
+
+        Provide a file analysis interpretation:
+        1. FILE THREAT ANALYSIS: Summarize the security risks found in the scanned file and their potential impact. Focus on actionable security insights.
+
+        Keep the interpretation under 600 characters.
+        """
+
+        return prompt
+
+    def _generate_interpretation(self, prompt: str) -> Dict[str, str]:
+        """
+        Generate interpretation using Gemini based on the given prompt.
+
+        Args:
+            prompt: The prompt for Gemini.
+
+        Returns:
+            A dictionary containing the interpretation.
+        """
+        try:
             # Generate interpretation
             response = self.model.generate_content(prompt)
-            
             interpretation_text = response.text.strip()
-            
+
             # Parse the response into sections
             sections = self._parse_interpretation_sections(interpretation_text)
-            
+
             return {
                 "tone_analysis": sections.get("tone", "Analysis not available"),
                 "prompt_injection_interpretation": sections.get("prompt_injection", "Analysis not available"),
-                "url_analysis": sections.get("urls", "Analysis not available")
+                "url_analysis": sections.get("urls", "Analysis not available"),
+                "file_analysis": sections.get("file", "Analysis not available")
             }
-            
         except Exception as e:
-            return {
-                "tone_analysis": f"Error in analysis: {str(e)}",
-                "prompt_injection_interpretation": f"Error in analysis: {str(e)}",
-                "url_analysis": f"Error in analysis: {str(e)}"
-            }
-    
+            return {"file_analysis": f"Error in analysis: {str(e)}"}
+
     def _parse_interpretation_sections(self, text: str) -> Dict[str, str]:
         """Parse the Gemini response into separate sections."""
         sections = {}
@@ -195,6 +274,10 @@ Keep each interpretation under 600 characters and focus on actionable security i
                 content = part.split(':', 1)[1] if ':' in part else part
                 sections['urls'] = content.strip()
         
+            elif part.startswith('1.') or 'FILE THREAT ANALYSIS' in part:
+                content = part.split(':', 1)[1] if ':' in part else part
+                sections['file'] = content.strip()
+
         return sections
     
     def is_available(self) -> bool:

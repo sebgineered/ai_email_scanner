@@ -2,6 +2,7 @@ import sys
 import os
 import streamlit as st
 import datetime
+import tempfile
 
 # Add the parent directory to the Python path to allow backend imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -47,6 +48,8 @@ if len(email_text) > 2000:
     st.warning(f"⚠️ Your input is {len(email_text)} characters long. Please limit to 2000 characters.")
     email_text = email_text[:2000]  # Optional: auto-trim
     st.info("Your input was trimmed to the first 2000 characters.")
+
+uploaded_file = st.file_uploader("Upload an attachment (optional)", type=["pdf","docx","txt"])
 
 def get_color(malicious, suspicious=0, field="default"):
     if field == "malicious":
@@ -122,25 +125,38 @@ def display_url_result(url, vt_result):
                 )
 
 # Run analysis
-if st.button("🔍 Scan Email"):
-    if not email_text.strip():
-        st.warning("Please enter some email content first.")
+if st.button("🔍 Scan Email and Attachment"):
+    if not email_text.strip() and not uploaded_file:
+        st.warning("Please enter some email content or upload a file first.")
     elif len(email_text) > 2000:
         st.error("Input too long. Please limit to 2000 characters.")
     else:
         with st.spinner("Analyzing email..."):
             pipeline = EmailSecurityPipeline()
-            result = pipeline.process_email(email_text)
+            
+            email_result = {}
+            file_result = {}
 
-        # Display prompt injection result from Lakera
-        prompt_flagged = result.get("prompt_flagged", False)
-        if prompt_flagged:
-            st.error("Prompt injection attempt detected! (Lakera flagged this input)")
-        else:
-            st.success("No prompt injection detected by Lakera.")
+            # Process email text
+            if email_text.strip():
+                email_result = pipeline.process_email(email_text)
+            
+            # Process the attached file
+            if uploaded_file is not None:
+                file_result = pipeline.process_attachment(uploaded_file)
+
+            # Get prompt injection result from email analysis
+            prompt_flagged = email_result.get("prompt_flagged", False)
+
+            # Display Lakera prompt injection result only if email text was provided
+            if email_text.strip():
+                if prompt_flagged:
+                    st.error("Prompt injection attempt detected! (Lakera flagged this input)")
+                else:
+                    st.success("No prompt injection detected by Lakera.")
 
         # Display intelligent interpretations from Cohere
-        interpretations = result.get("interpretations", {})
+        interpretations = email_result.get("interpretations", {})
         if interpretations:
             st.markdown("### 🤖 AI-Powered Analysis")
             
@@ -166,13 +182,25 @@ if st.button("🔍 Scan Email"):
                 st.info(url_analysis)
 
         # Display URL results
-        url_results = result.get("urls", [])
+        url_results = email_result.get("urls", [])
         if url_results:
             st.markdown("### Extracted URLs and Scan Results:")
             for url_info in url_results:
                 display_url_result(url_info["url"], url_info["result"])
-        else:
+        elif email_text.strip():
             st.info("No URLs found in the email.")
+
+        # Display file analysis results
+        if file_result:
+            st.markdown("### 🧾 Attachment File Scan Result")
+            file_interpretations = file_result.get("interpretations", {})
+            st.info(file_interpretations.get("file_analysis", "No analysis available."))
+
+            # Optionally show raw VirusTotal result:
+            vt_data = file_result.get("vt_result", {})
+            if vt_data:
+                st.markdown("#### 🦠 Raw VirusTotal Scan Summary")
+                st.json(vt_data)
 
 # Footer
 st.markdown("---")
