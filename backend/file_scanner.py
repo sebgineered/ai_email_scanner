@@ -59,6 +59,26 @@ class FileScanner:
         except Exception as e:
             return {"error": f"Error checking file hash: {e}"}
 
+    def aggregate_vt_results(self, vt_result: dict):
+        """Aggregate the analysis results from VirusTotal."""
+        if not vt_result or "error" in vt_result:
+            return None
+
+        # Extract the last analysis stats
+        stats = vt_result.get("attributes", {}).get("last_analysis_stats", {})
+        
+        # Get the total number of engines
+        total_engines = sum(stats.values())
+
+        return {
+            "harmless": stats.get("harmless", 0),
+            "malicious": stats.get("malicious", 0),
+            "suspicious": stats.get("suspicious", 0),
+            "timeout": stats.get("timeout", 0),
+            "undetected": stats.get("undetected", 0),
+            "total_engines": total_engines
+        }
+
     def interpret_file_results(self, vt_result: dict):
         """Generate an interpretation of the file scan results."""
         return self.interpreter.interpret_file_results(vt_result)

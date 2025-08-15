@@ -193,14 +193,38 @@ if st.button("🔍 Scan Email and Attachment"):
         # Display file analysis results
         if file_result:
             st.markdown("### 🧾 Attachment File Scan Result")
-            file_interpretations = file_result.get("interpretations", {})
-            st.info(file_interpretations.get("file_analysis", "No analysis available."))
+            
+            # Display VirusTotal Scan Summary first
+            aggregated_result = file_result.get("aggregated_result")
+            if aggregated_result:
+                st.markdown("#### 🦠 VirusTotal Scan Summary")
 
-            # Optionally show raw VirusTotal result:
-            vt_data = file_result.get("vt_result", {})
-            if vt_data:
-                st.markdown("#### 🦠 Raw VirusTotal Scan Summary")
-                st.json(vt_data)
+                malicious = aggregated_result.get("malicious", 0)
+                suspicious = aggregated_result.get("suspicious", 0)
+                total_engines = aggregated_result.get("total_engines", 0)
+                
+                detection_ratio = (malicious + suspicious) / total_engines if total_engines > 0 else 0
+
+                if malicious > 0:
+                    st.error(f"**{malicious} out of {total_engines} engines detected this file as malicious.**")
+                elif suspicious > 0:
+                    st.warning(f"**{suspicious} out of {total_engines} engines detected this file as suspicious.**")
+                else:
+                    st.success(f"**No security vendors flagged this file as malicious.**")
+
+                st.progress(detection_ratio)
+
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Malicious", malicious)
+                col2.metric("Suspicious", suspicious)
+                col3.metric("Total Engines", total_engines)
+
+            # Display Gemini interpretation
+            file_interpretations = file_result.get("interpretations", {})
+            if file_interpretations:
+                st.markdown("#### 🤖 AI-Powered Analysis")
+                analysis = file_interpretations.get("file_analysis", "No analysis available.")
+                st.info(analysis)
 
 # Footer
 st.markdown("---")

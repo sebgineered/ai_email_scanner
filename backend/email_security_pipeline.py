@@ -65,13 +65,17 @@ class EmailSecurityPipeline:
 
             # 2. Check with VirusTotal
             vt_result = self.file_scanner.check_file_hash(file_hash)
+
+            # 3. Aggregate the results
+            aggregated_result = self.file_scanner.aggregate_vt_results(vt_result)
             
-            # 3. Interpret using Gemini
+            # 4. Interpret using Gemini
             interpretation = self.file_scanner.interpret_file_results(vt_result)
 
             return {
                 "hash": file_hash,
                 "vt_result": vt_result,
+                "aggregated_result": aggregated_result,
                 "interpretations": interpretation
             }
 

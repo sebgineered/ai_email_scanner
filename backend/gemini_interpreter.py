@@ -120,23 +120,34 @@ class GeminiInterpreter:
         prompt = self._build_email_prompt(email_text, prompt_injection_result, url_results)
         return self._generate_interpretation(prompt)
 
-    def interpret_file_results(self, file_results: Dict[str, Any]) -> Dict[str, str]:
+    def interpret_file_results(self, vt_result: dict):
         """
-        Generate intelligent interpretation of file scan results.
-
-        Args:
-            file_results: Results from VirusTotal file scanning
-
-        Returns:
-            Dictionary containing interpretations for file analysis
+        Provides an interpretation of the file scan results from VirusTotal.
         """
-        if not self.model:
-            return {
-                "file_analysis": "Gemini API not available"
-            }
+        if not vt_result or "error" in vt_result:
+            return {"file_analysis": "Analysis not available due to an error or lack of data."}
 
-        prompt = self._build_file_prompt(file_results)
-        return self._generate_interpretation(prompt)
+        try:
+            prompt = f"""
+            Analyze the following VirusTotal file scan results and provide a brief, easy-to-understand security assessment for a non-technical user.
+
+            **VirusTotal Data:**
+            ```json
+            {vt_result}
+            ```
+
+            **Assessment:**
+            - **Risk Level:** (e.g., Safe, Low, Medium, High, Critical)
+            - **Summary:** (A one-sentence summary of the findings)
+            - **Recommendation:** (What should the user do?)
+            """
+            
+            response = self.model.generate_content(prompt)
+            return {"file_analysis": response.text}
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Error during Gemini interpretation: {e}")
+            return {"file_analysis": "Failed to get analysis from Gemini."}
 
     def _build_email_prompt(self, 
                          email_text: str, 
@@ -274,7 +285,7 @@ Keep each interpretation under 600 characters and focus on actionable security i
                 content = part.split(':', 1)[1] if ':' in part else part
                 sections['urls'] = content.strip()
         
-            elif part.startswith('1.') or 'FILE THREAT ANALYSIS' in part:
+            elif 'FILE THREAT ANALYSIS' in part:
                 content = part.split(':', 1)[1] if ':' in part else part
                 sections['file'] = content.strip()
 
