@@ -46,7 +46,17 @@ def check_url_with_mcp(url, api_key=None):
         stats = attr.get("last_analysis_stats", {})
         categories = attr.get("categories", {})
         reputation = attr.get("reputation", 0)
+        
+        # Ensure last_analysis_date is an integer timestamp
         last_analysis_date = attr.get("last_analysis_date", None)
+        if last_analysis_date is not None:
+            try:
+                # Convert to int if it's a string
+                if isinstance(last_analysis_date, str) and last_analysis_date.isdigit():
+                    last_analysis_date = int(last_analysis_date)
+            except (ValueError, TypeError):
+                pass  # Keep the original value if conversion fails
+                
         last_final_url = attr.get("last_final_url", "")
         threat_names = attr.get("threat_names", [])
         votes = attr.get("total_votes", {})

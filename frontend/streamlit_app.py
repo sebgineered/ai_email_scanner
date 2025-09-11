@@ -4,6 +4,7 @@ import streamlit as st
 import datetime
 import tempfile
 import pandas as pd
+import re
 
 # Add the parent directory to the Python path to allow backend imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -179,9 +180,8 @@ if parsed_email and parsed_email.get("body_text", "") and not email_text.strip()
             key="email_text_updated"
         )
 
-# Regular file attachment upload (for non-email files) - only show in manual input tab
-with input_tab:
-    uploaded_file = st.file_uploader("Upload an additional attachment (optional)", type=["pdf","docx","txt"])
+# Regular file attachment upload (for non-email files)
+uploaded_file = st.file_uploader("Upload an additional attachment (optional)", type=["pdf","docx","txt"])
 
 def get_color(malicious, suspicious=0, field="default"):
     if field == "malicious":
@@ -222,8 +222,17 @@ def display_url_result(url, vt_result):
     st.markdown(f"  - Reputation: <span style='color:{reputation_color}'>{reputation}</span>", unsafe_allow_html=True)
 
     if last_analysis_date:
-        dt = datetime.datetime.fromtimestamp(last_analysis_date)
-        st.markdown(f"  - Last Analysis Date: <span style='color:{last_analysis_date_color}'>{dt}</span>", unsafe_allow_html=True)
+        try:
+            dt = datetime.datetime.fromtimestamp(last_analysis_date)
+            st.markdown(f"  - Last Analysis Date: <span style='color:{last_analysis_date_color}'>{dt}</span>", unsafe_allow_html=True)
+        except (TypeError, ValueError):
+            # Try to convert if it's a string representation of a timestamp
+            if isinstance(last_analysis_date, str) and last_analysis_date.isdigit():
+                try:
+                    dt = datetime.datetime.fromtimestamp(int(last_analysis_date))
+                    st.markdown(f"  - Last Analysis Date: <span style='color:{last_analysis_date_color}'>{dt}</span>", unsafe_allow_html=True)
+                except (TypeError, ValueError):
+                    st.markdown(f"  - Last Analysis Date: <span style='color:{last_analysis_date_color}'>{last_analysis_date}</span>", unsafe_allow_html=True)
 
     if last_final_url and last_final_url != url:
         if malicious > 0:
@@ -273,6 +282,13 @@ if st.button("🔍 Scan Email and Attachments"):
             # Process email text
             if email_text.strip():
                 email_result = pipeline.process_email(email_text)
+            # Process parsed email body text if available and no manual text was entered
+            elif parsed_email and parsed_email.get("body_text", "").strip():
+                # Fix the defanged URLs by replacing [.] back to . for URL extraction
+                parsed_body = parsed_email.get("body_text", "")
+                # Restore URLs for processing (convert [.] back to .)
+                parsed_body_fixed = re.sub(r'\[(\.)\]', r'\1', parsed_body)
+                email_result = pipeline.process_email(parsed_body_fixed)
             
             # Process the regular attached file (if any)
             if uploaded_file is not None:
@@ -352,7 +368,7 @@ if st.button("🔍 Scan Email and Attachments"):
             st.markdown("### Extracted URLs and Scan Results:")
             for url_info in url_results:
                 display_url_result(url_info["url"], url_info["result"])
-        elif email_text.strip():
+        elif email_text.strip() or (parsed_email and parsed_email.get("body_text", "").strip()):
             st.info("No URLs found in the email.")
 
         # Display file analysis results for regular attachments
