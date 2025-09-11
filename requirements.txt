@@ -5,3 +5,6 @@ urlextract>=1.8.0
 tldextract>=5.1.1
 virustotal-python==1.1.0
 python-dotenv>=0.21.0
+beautifulsoup4>=4.12.0
+extract-msg>=0.41.0
+pandas>=2.0.0
