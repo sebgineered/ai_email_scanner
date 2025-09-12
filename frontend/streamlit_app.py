@@ -281,13 +281,17 @@ if st.button("🔍 Scan Email and Attachments"):
 
             # Process email text
             if email_text.strip():
-                email_result = pipeline.process_email(email_text)
+                text_to_process = email_text
+                # If a file was parsed, the URLs in the text area might be defanged
+                if parsed_email:
+                    text_to_process = re.sub(r'\[\.\]', '.', text_to_process)
+                email_result = pipeline.process_email(text_to_process)
             # Process parsed email body text if available and no manual text was entered
             elif parsed_email and parsed_email.get("body_text", "").strip():
                 # Fix the defanged URLs by replacing [.] back to . for URL extraction
                 parsed_body = parsed_email.get("body_text", "")
                 # Restore URLs for processing (convert [.] back to .)
-                parsed_body_fixed = re.sub(r'\[(\.)\]', r'\1', parsed_body)
+                parsed_body_fixed = re.sub(r'\[\.\]', '.', parsed_body)
                 email_result = pipeline.process_email(parsed_body_fixed)
             
             # Process the regular attached file (if any)
